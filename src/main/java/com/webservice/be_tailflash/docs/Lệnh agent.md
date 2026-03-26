@@ -1,0 +1,2 @@
+/autonomous-code-repair Ưu tiên đọc kĩ tài liệu Phân tích ý tưởng. Dựa vào đó hãy phát triển hoàn thành các tính năng còn thiếu (Cho phép ở chế độ demo chưa cần backend)
+/autonomous-code-repair Hãy phát triển hoàn thành các tính năng còn thiếu (Cho phép ở chế độ demo chưa cần backend)
