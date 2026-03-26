@@ -1,54 +1,346 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.4</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>com.webservice</groupId>
-	<artifactId>BE_TailFlash</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>BE_TailFlash</name>
-	<description>BE_TailFlash</description>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
-	<properties>
-		<java.version>25</java.version>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.4</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.webservice</groupId>
+    <artifactId>BE_TailFlash</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>BE_TailFlash</name>
+    <description>BE_TailFlash</description>
+    <url/>
+    <licenses>
+        <license/>
+    </licenses>
+    <developers>
+        <developer/>
+    </developers>
+    <scm>
+        <connection/>
+        <developerConnection/>
+        <tag/>
+        <url/>
+    </scm>
+    <properties>
+        <java.version>25</java.version>
+    </properties>
+    <dependencies>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <!-- spring-boot-starter-data-jpa
+             Cung cấp Hibernate + JPA + transaction.
+             Dùng để mapping Entity <-> Bảng DB và thao tác thông qua Repository.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <!-- spring-boot-starter-jdbc
+             JDBC core (DataSource, JdbcTemplate). Có thể BỎ nếu chỉ dùng JPA/Hibernate.
+             Giữ lại nếu có chỗ chạy truy vấn thuần JDBC hoặc gọi thủ tục (Stored Procedure).
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <!-- spring-boot-starter-mail
+             Gửi email (SMTP). Dùng cho: xác thực tài khoản, quên mật khẩu, gửi thông báo đơn hàng.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <!-- spring-boot-starter-oauth2-client
+             Đăng nhập với nhà cung cấp bên thứ 3 (Google, Facebook...). Hỗ trợ OAuth2 login flow.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+        <!-- spring-boot-starter-oauth2-resource-server
+             Giúp backend xác thực/ủy quyền dựa trên JWT Bearer token (Authorization: Bearer ...).
+             Phù hợp khi tách BE thành Resource Server hoặc tự phát hành JWT.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+        <!-- spring-boot-starter-security
+             Bảo mật chung: filter chain, AuthenticationManager, PasswordEncoder.
+             Nhiều phần đã được kéo transitively bởi oauth2 nhưng khai báo rõ giúp dễ đọc.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <!-- spring-boot-starter-thymeleaf
+             Engine render HTML (server-side). Dùng cho trang đăng nhập, email template, giao diện quản trị.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <!-- spring-boot-starter-validation
+             Bean Validation (Jakarta Validation + Hibernate Validator). @NotNull, @Email, @Size...
+             Tự động validate @RequestBody, @ModelAttribute, DTO.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <!-- spring-boot-starter-web
+             Cốt lõi xây REST API (Spring MVC + Jackson). Controller, @RestController.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+        <!-- spring-boot-starter-web-services
+             Hỗ trợ SOAP (Contract-First hoặc Code-First). BỎ được nếu chỉ làm REST.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web-services</artifactId>
+        </dependency>
+        <!-- thymeleaf-extras-springsecurity6
+             Thêm thẻ sec:* trong Thymeleaf để ẩn/hiện UI theo quyền (ROLE) người dùng.
+        -->
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+        </dependency>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+        <!-- spring-boot-devtools
+             Tự động restart khi code thay đổi, LiveReload. Chỉ dùng DEV (đừng deploy PROD).
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- mysql-connector-j
+             Driver JDBC MySQL. Cần cho Hibernate/JPA kết nối MySQL.
+        -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- lombok
+             Giảm boilerplate: getter/setter, builder, constructor. Cần bật annotation processing IDE.
+        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- spring-boot-starter-test
+             Bộ test: JUnit 5, AssertJ, Mockito, JSON path, Spring TestContext.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- spring-security-test
+             Mock người dùng, kiểm tra bảo mật filter chain, test @WithMockUser.
+        -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--Thư viện ngoài-->
+        <!-- google-api-client
+             Thư viện chung gọi các Google API (HTTP transport, JSON). Nếu chỉ OAuth login có thể không cần.
+        -->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+        </dependency>
+        <!-- google-oauth-client
+             Hỗ trợ quy trình OAuth 2.0 với Google: trao đổi mã code lấy access/refresh token.
+        -->
+        <dependency>
+            <groupId>com.google.oauth-client</groupId>
+            <artifactId>google-oauth-client</artifactId>
+        </dependency>
+        <!-- mapstruct
+             Mapping compile-time cho DTO <-> Entity, nhanh và tránh lỗi runtime.
+        -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+        <!-- mapstruct-processor
+             Annotation processor tạo code mapper thực tế ở target/generated-sources.
+        -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- spring-security-core (đã bao gồm trong starter). Khai rõ để cố định phiên bản.
+             Có thể bỏ nếu không cần override version.
+        -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <!-- spring-security-oauth2-jose
+             Hỗ trợ xử lý JWT/JWS/JWE (giải mã, xác thực chữ ký) cho OAuth2 Resource Server.
+        -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+        <!-- spring-security-crypto
+             Các hàm mã hoá/băm (BCryptPasswordEncoder, AES utilities...).
+        -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+        <!-- jakarta.servlet-api
+             API Servlet cho compile-time. Spring Boot Tomcat đã cung cấp runtime rồi → có thể bỏ.
+        -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+        </dependency>
+        <!-- springdoc-openapi-starter-webmvc-ui
+             Sinh tài liệu OpenAPI + giao diện Swagger UI tại /swagger-ui.html hoặc /swagger-ui/index.html.
+        -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+        <!-- jjwt-api / impl / jackson
+             Tạo & parse JWT thủ công (dùng kịch bản custom ngoài cơ chế mặc định của Spring Security).
+             - api: interface
+             - impl: thực thi (runtime)
+             - jackson: serialize/deserialize phần payload JSON.
+        -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId> <!-- hoặc jjwt-gson tùy chọn -->
+            <scope>runtime</scope>
+        </dependency>
+        <!-- cloudinary-http44
+             Upload & quản lý ảnh/video lên Cloudinary (tự xử lý resize, CDN, tối ưu hóa).
+        -->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http44</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- spring-boot-maven-plugin
+                 Đóng gói executable jar (fat jar), thêm main class manifest.
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <!-- spotless-maven-plugin
+                 Format code Java tự động, xóa import thừa, chuẩn hóa style.
+                 Chạy goal: mvn spotless:apply để áp định dạng.
+            -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <configuration>
+                    <java>
+                        <removeUnusedImports/>
+                        <toggleOffOn/>
+                        <palantirJavaFormat/>
+                        <endWithNewline/>
+                        <indent>
+                            <tabs>true</tabs>
+                            <spacesPerTab>4</spacesPerTab>
+                        </indent>
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
+                        <importOrder>
+                            <order>java, javax, jakarta, org, com, com.diffplug</order>
+                        </importOrder>
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                            <goal>apply</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- maven-surefire-plugin
+                 Chạy test đơn vị (JUnit 5). Thường tự cấu hình nhưng khai báo version để ổn định.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <!-- maven-compiler-plugin (khai báo riêng đường dẫn annotation processor cho Lombok)
+                Nếu dùng mapstruct + lombok đồng thời: có thể thêm cả mapstruct-processor ở đây.
+                 Ấn định source/target Java và bật preview features (-enable-preview) nếu dùng.
+                 Có thể gộp với plugin compiler ở trên để tránh trùng lặp.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <!-- Lombok -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </path>
+                        <!-- MapStruct processor -->
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                        </path>
+                        <!-- Lombok + MapStruct integration -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                        </path>
+                        <!-- Có thể thêm mapstruct-processor tại đây thay vì dependency scope=provided -->
+                    </annotationProcessorPaths>
+                    <source>25</source>
+                    <target>25</target>
+                    <compilerArgs>
+                        <!-- <arg>-enable-preview</arg>  Nếu bạn dùng các tính năng preview -->
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
