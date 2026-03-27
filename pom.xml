@@ -28,6 +28,15 @@
     </scm>
     <properties>
         <java.version>25</java.version>
+        <lombok.version>1.18.38</lombok.version>
+        <google.api.client.version>2.8.0</google.api.client.version>
+        <google.oauth.client.version>1.37.0</google.oauth.client.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <lombok.mapstruct.binding.version>0.2.0</lombok.mapstruct.binding.version>
+        <springdoc.version>2.8.5</springdoc.version>
+        <jjwt.version>0.12.6</jjwt.version>
+        <cloudinary.version>1.38.0</cloudinary.version>
+        <spotless.maven.plugin.version>2.43.0</spotless.maven.plugin.version>
     </properties>
     <dependencies>
 
@@ -46,6 +55,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
         </dependency>
         <!-- spring-boot-starter-mail
              Gửi email (SMTP). Dùng cho: xác thực tài khoản, quên mật khẩu, gửi thông báo đơn hàng.
@@ -144,7 +157,7 @@
         -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- spring-security-test
@@ -162,6 +175,7 @@
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
+            <version>${google.api.client.version}</version>
         </dependency>
         <!-- google-oauth-client
              Hỗ trợ quy trình OAuth 2.0 với Google: trao đổi mã code lấy access/refresh token.
@@ -169,6 +183,7 @@
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client</artifactId>
+            <version>${google.oauth.client.version}</version>
         </dependency>
         <!-- mapstruct
              Mapping compile-time cho DTO <-> Entity, nhanh và tránh lỗi runtime.
@@ -176,6 +191,7 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
         </dependency>
         <!-- mapstruct-processor
              Annotation processor tạo code mapper thực tế ở target/generated-sources.
@@ -183,6 +199,7 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- spring-security-core (đã bao gồm trong starter). Khai rõ để cố định phiên bản.
@@ -219,6 +236,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
         <!-- jjwt-api / impl / jackson
              Tạo & parse JWT thủ công (dùng kịch bản custom ngoài cơ chế mặc định của Spring Security).
@@ -229,15 +247,18 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId> <!-- hoặc jjwt-gson tùy chọn -->
+            <version>${jjwt.version}</version>
             <scope>runtime</scope>
         </dependency>
         <!-- cloudinary-http44
@@ -246,6 +267,7 @@
         <dependency>
             <groupId>com.cloudinary</groupId>
             <artifactId>cloudinary-http44</artifactId>
+            <version>${cloudinary.version}</version>
         </dependency>
     </dependencies>
 
@@ -273,6 +295,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.maven.plugin.version}</version>
                 <configuration>
                     <java>
                         <removeUnusedImports/>
@@ -320,16 +343,19 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
                         </path>
                         <!-- MapStruct processor -->
                         <path>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
                         </path>
                         <!-- Lombok + MapStruct integration -->
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>${lombok.mapstruct.binding.version}</version>
                         </path>
                         <!-- Có thể thêm mapstruct-processor tại đây thay vì dependency scope=provided -->
                     </annotationProcessorPaths>
