@@ -1,5 +1,6 @@
 package com.webservice.be_tailflash.modules.auth.mail;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.http.HttpStatus;
@@ -48,7 +49,7 @@ public class SmtpPasswordResetMailService implements PasswordResetMailService {
             helper.setSubject("TailFlash - Password reset request");
             helper.setText(htmlBody, true);
             mailSender.send(message);
-        } catch (MailException | MessagingException ex) {
+        } catch (MailException | MessagingException | UnsupportedEncodingException ex) {
             throw new ApiException(
                 "AUTH_RESET_EMAIL_SEND_FAILED",
                 "Unable to send password reset email",

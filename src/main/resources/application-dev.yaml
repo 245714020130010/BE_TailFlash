@@ -1,6 +1,10 @@
 spring:
   jpa:
+    hibernate:
+      ddl-auto: update
     show-sql: true
+  flyway:
+    enabled: false
   datasource:
     hikari:
       maximum-pool-size: 10

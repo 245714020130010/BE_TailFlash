@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   mysql:
     image: mysql:8.0
@@ -10,6 +9,12 @@ services:
       MYSQL_DATABASE: tailflash_db
       MYSQL_USER: tailflash_user
       MYSQL_PASSWORD: password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
     volumes:
       - db_data:/var/lib/mysql
 
@@ -19,15 +24,28 @@ services:
       dockerfile: Dockerfile
     container_name: tailflash-backend
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - "8080:8080"
+    restart: unless-stopped
     environment:
       SERVER_PORT: 8080
       SPRING_PROFILES_ACTIVE: dev
       DB_URL: jdbc:mysql://mysql:3306/tailflash_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       DB_USERNAME: tailflash_user
       DB_PASSWORD: password
+      JWT_SECRET: ${JWT_SECRET:-tailflash-dev-jwt-secret-change-me-at-least-32-chars}
+      JWT_ACCESS_TTL_SECONDS: ${JWT_ACCESS_TTL_SECONDS:-900}
+      JWT_REFRESH_TTL_SECONDS: ${JWT_REFRESH_TTL_SECONDS:-604800}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM_EMAIL: ${MAIL_FROM_EMAIL:-no-reply@tailflash.local}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-TailFlash Support}
+      PASSWORD_RESET_URL: ${PASSWORD_RESET_URL:-http://localhost:3000/reset-password}
+      PASSWORD_RESET_TOKEN_TTL_MINUTES: ${PASSWORD_RESET_TOKEN_TTL_MINUTES:-15}
 
 volumes:
   db_data:
