@@ -1,19 +1,27 @@
 package com.webservice.be_tailflash.modules.auth;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.webservice.be_tailflash.common.dto.MessageResponse;
 import com.webservice.be_tailflash.common.enums.Role;
+import com.webservice.be_tailflash.common.enums.TeacherProfileStatus;
+import com.webservice.be_tailflash.common.enums.UserStatus;
 import com.webservice.be_tailflash.common.exception.BadRequestException;
 import com.webservice.be_tailflash.common.exception.ConflictException;
 import com.webservice.be_tailflash.common.exception.ResourceNotFoundException;
 import com.webservice.be_tailflash.common.exception.UnauthorizedException;
 import com.webservice.be_tailflash.modules.auth.dto.AuthUserResponse;
+import com.webservice.be_tailflash.modules.auth.dto.AuthSessionResponse;
 import com.webservice.be_tailflash.modules.auth.dto.ChangePasswordRequest;
 import com.webservice.be_tailflash.modules.auth.dto.ForgotPasswordRequest;
 import com.webservice.be_tailflash.modules.auth.dto.LoginRequest;
@@ -21,7 +29,11 @@ import com.webservice.be_tailflash.modules.auth.dto.LoginResponse;
 import com.webservice.be_tailflash.modules.auth.dto.LogoutRequest;
 import com.webservice.be_tailflash.modules.auth.dto.RefreshTokenRequest;
 import com.webservice.be_tailflash.modules.auth.dto.RegisterRequest;
+import com.webservice.be_tailflash.modules.auth.dto.RoleInfoResponse;
 import com.webservice.be_tailflash.modules.auth.dto.ResetPasswordRequest;
+import com.webservice.be_tailflash.modules.auth.dto.TeacherProfileSummaryResponse;
+import com.webservice.be_tailflash.modules.auth.entity.TeacherProfile;
+import com.webservice.be_tailflash.modules.auth.entity.UserRole;
 import com.webservice.be_tailflash.modules.auth.entity.UserSession;
 import com.webservice.be_tailflash.modules.auth.mail.PasswordResetMailProperties;
 import com.webservice.be_tailflash.modules.auth.mail.PasswordResetMailService;
@@ -36,8 +48,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private static final String DEFAULT_UI_LANGUAGE = "vi";
+    private static final String DEFAULT_LEARN_LANGUAGE = "en";
+    private static final String DEFAULT_TIMEZONE = "Asia/Ho_Chi_Minh";
     private final UserRepository userRepository;
     private final UserSessionRepository userSessionRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final TeacherProfileRepository teacherProfileRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtProperties jwtProperties;
@@ -52,18 +69,41 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = new User();
+        Role requestedRole = request.role() == null ? Role.LEARNER : request.role();
+        UserRole userRole = resolveRole(requestedRole);
+
         user.setEmail(request.email());
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setDisplayName(request.displayName());
         user.setEmailVerified(false);
-        user.setRole(request.role() == null ? Role.LEARNER : request.role());
+        user.setRole(userRole);
+        user.setUiLanguage(DEFAULT_UI_LANGUAGE);
+        user.setLearnLang(DEFAULT_LEARN_LANGUAGE);
+        user.setTimezone(DEFAULT_TIMEZONE);
+        user.setXpPoints(0L);
+        user.setLevel(1);
+        user.setStreakCount(0);
+        user.setStatus(UserStatus.ACTIVE);
+
+        Instant now = Instant.now();
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+
         User savedUser = userRepository.save(user);
+
+        if (Role.TEACHER.equals(requestedRole)) {
+            TeacherProfile teacherProfile = new TeacherProfile();
+            teacherProfile.setUserId(savedUser.getId());
+            teacherProfile.setStatus(TeacherProfileStatus.PENDING);
+            teacherProfile.setCreatedAt(now);
+            teacherProfileRepository.save(teacherProfile);
+        }
 
         return issueTokens(savedUser);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
             .orElseThrow(() -> new UnauthorizedException("AUTH_INVALID_CREDENTIALS", "Invalid email or password"));
@@ -180,16 +220,48 @@ public class AuthServiceImpl implements AuthService {
         return toAuthUser(user);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<AuthSessionResponse> getSessions(Long userId) {
+        return userSessionRepository.findAllByUserIdOrderByCreatedAtDesc(userId)
+            .stream()
+            .map(session -> new AuthSessionResponse(
+                session.getId(),
+                session.getDeviceInfo(),
+                session.getIpAddress(),
+                session.getCreatedAt(),
+                session.getExpiresAt(),
+                session.isRevoked()
+            ))
+            .toList();
+    }
+
+    @Override
+    @Transactional
+    public MessageResponse revokeSession(Long userId, Long sessionId) {
+        UserSession session = userSessionRepository.findByIdAndUserId(sessionId, userId)
+            .orElseThrow(() -> new ResourceNotFoundException("AUTH_SESSION_NOT_FOUND", "Session not found"));
+
+        session.setRevoked(true);
+        userSessionRepository.save(session);
+        return new MessageResponse("Session revoked");
+    }
+
     private LoginResponse issueTokens(User user) {
-        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), user.getRole());
+        String roleName = user.getRole().getName();
+        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), roleName);
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+        Instant now = Instant.now();
 
         UserSession session = new UserSession();
         session.setUserId(user.getId());
+        session.setToken(refreshToken);
         session.setRefreshTokenHash(jwtTokenProvider.hashToken(refreshToken));
-        session.setExpiresAt(Instant.now().plusSeconds(jwtProperties.refreshTokenTtlSeconds()));
+        session.setDeviceInfo(resolveDeviceInfo());
+        session.setIpAddress(resolveIpAddress());
+        session.setExpiresAt(now.plusSeconds(jwtProperties.refreshTokenTtlSeconds()));
         session.setRevoked(false);
-        session.setCreatedAt(Instant.now());
+        session.setCreatedAt(now);
         userSessionRepository.save(session);
 
         return new LoginResponse(
@@ -202,12 +274,64 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private AuthUserResponse toAuthUser(User user) {
+        TeacherProfileSummaryResponse teacherProfileSummary = teacherProfileRepository.findByUserId(user.getId())
+            .map(profile -> new TeacherProfileSummaryResponse(
+                profile.getId(),
+                profile.getStatus().name(),
+                profile.getReviewedAt(),
+                profile.getRejectReason()
+            ))
+            .orElse(null);
+
+        RoleInfoResponse roleInfo = new RoleInfoResponse(
+            user.getRole().getId(),
+            user.getRole().getName(),
+            user.getRole().getDescription()
+        );
+
         return new AuthUserResponse(
             user.getId(),
             user.getEmail(),
             user.getDisplayName(),
-            user.getRole().name(),
-            user.isEmailVerified()
+            user.getRole().getName(),
+            user.isEmailVerified(),
+            user.getStatus().name(),
+            roleInfo,
+            teacherProfileSummary
         );
+    }
+
+    private UserRole resolveRole(Role requestedRole) {
+        return userRoleRepository.findByName(requestedRole.name())
+            .orElseThrow(() -> new BadRequestException("AUTH_ROLE_NOT_SUPPORTED", "Role is not supported"));
+    }
+
+    private String resolveDeviceInfo() {
+        HttpServletRequest request = currentRequest();
+        if (request == null) {
+            return null;
+        }
+        return request.getHeader("User-Agent");
+    }
+
+    private String resolveIpAddress() {
+        HttpServletRequest request = currentRequest();
+        if (request == null) {
+            return null;
+        }
+
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        if (forwardedFor != null && !forwardedFor.isBlank()) {
+            return forwardedFor.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
+    }
+
+    private HttpServletRequest currentRequest() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            return null;
+        }
+        return attributes.getRequest();
     }
 }

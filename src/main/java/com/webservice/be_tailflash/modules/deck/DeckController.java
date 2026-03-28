@@ -39,25 +39,25 @@ public class DeckController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<DeckResponse>>> getAll() {
         AuthPrincipal principal = SecurityUtils.currentPrincipal();
-        return ResponseEntity.ok(ApiResponse.success(deckService.getAll(principal.userId(), principal.role().name())));
+        return ResponseEntity.ok(ApiResponse.success(deckService.getAll(principal.userId(), principal.role())));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<DeckResponse>> getById(@PathVariable Long id) {
         AuthPrincipal principal = SecurityUtils.currentPrincipal();
-        return ResponseEntity.ok(ApiResponse.success(deckService.getById(principal.userId(), principal.role().name(), id)));
+        return ResponseEntity.ok(ApiResponse.success(deckService.getById(principal.userId(), principal.role(), id)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<DeckResponse>> update(@PathVariable Long id, @Valid @RequestBody UpdateDeckRequest request) {
         AuthPrincipal principal = SecurityUtils.currentPrincipal();
-        return ResponseEntity.ok(ApiResponse.success(deckService.update(principal.userId(), principal.role().name(), id, request)));
+        return ResponseEntity.ok(ApiResponse.success(deckService.update(principal.userId(), principal.role(), id, request)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         AuthPrincipal principal = SecurityUtils.currentPrincipal();
-        deckService.delete(principal.userId(), principal.role().name(), id);
+        deckService.delete(principal.userId(), principal.role(), id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

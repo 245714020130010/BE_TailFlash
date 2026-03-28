@@ -36,6 +36,15 @@ public class UserSession {
     @Column(nullable = false, length = 255)
     private String refreshTokenHash;
 
+    @Column(length = 255)
+    private String token;
+
+    @Column(length = 255)
+    private String deviceInfo;
+
+    @Column(length = 64)
+    private String ipAddress;
+
     @Column(nullable = false)
     private Instant expiresAt;
 

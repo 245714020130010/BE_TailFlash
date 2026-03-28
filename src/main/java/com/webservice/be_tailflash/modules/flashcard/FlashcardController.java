@@ -36,7 +36,7 @@ public class FlashcardController {
         @Valid @RequestBody CreateFlashcardRequest request
     ) {
         AuthPrincipal principal = SecurityUtils.currentPrincipal();
-        FlashcardResponse response = flashcardService.create(principal.userId(), principal.role().name(), deckId, request);
+        FlashcardResponse response = flashcardService.create(principal.userId(), principal.role(), deckId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response));
     }
 
@@ -44,7 +44,7 @@ public class FlashcardController {
     public ResponseEntity<ApiResponse<List<FlashcardResponse>>> getByDeck(@PathVariable Long deckId) {
         AuthPrincipal principal = SecurityUtils.currentPrincipal();
         return ResponseEntity.ok(
-            ApiResponse.success(flashcardService.getByDeck(principal.userId(), principal.role().name(), deckId))
+            ApiResponse.success(flashcardService.getByDeck(principal.userId(), principal.role(), deckId))
         );
     }
 
@@ -57,7 +57,7 @@ public class FlashcardController {
         AuthPrincipal principal = SecurityUtils.currentPrincipal();
         FlashcardResponse response = flashcardService.update(
             principal.userId(),
-            principal.role().name(),
+            principal.role(),
             deckId,
             cardId,
             request
@@ -68,7 +68,7 @@ public class FlashcardController {
     @DeleteMapping("/{cardId}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long deckId, @PathVariable("cardId") Long cardId) {
         AuthPrincipal principal = SecurityUtils.currentPrincipal();
-        flashcardService.delete(principal.userId(), principal.role().name(), deckId, cardId);
+        flashcardService.delete(principal.userId(), principal.role(), deckId, cardId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

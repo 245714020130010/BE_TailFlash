@@ -18,6 +18,6 @@ public class UserServiceImpl implements UserService {
     public UserProfileResponse getByEmail(String email) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return new UserProfileResponse(user.getId(), user.getEmail(), user.getDisplayName(), user.getRole().name());
+        return new UserProfileResponse(user.getId(), user.getEmail(), user.getDisplayName(), user.getRole().getName());
     }
 }

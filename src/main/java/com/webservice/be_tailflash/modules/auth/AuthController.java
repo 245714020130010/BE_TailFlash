@@ -2,16 +2,20 @@ package com.webservice.be_tailflash.modules.auth;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 
 import com.webservice.be_tailflash.common.dto.ApiResponse;
 import com.webservice.be_tailflash.common.dto.MessageResponse;
 import com.webservice.be_tailflash.modules.auth.dto.AuthUserResponse;
+import com.webservice.be_tailflash.modules.auth.dto.AuthSessionResponse;
 import com.webservice.be_tailflash.modules.auth.dto.ChangePasswordRequest;
 import com.webservice.be_tailflash.modules.auth.dto.ForgotPasswordRequest;
 import com.webservice.be_tailflash.modules.auth.dto.LoginRequest;
@@ -74,5 +78,17 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthUserResponse>> me() {
         AuthPrincipal principal = SecurityUtils.currentPrincipal();
         return ResponseEntity.ok(ApiResponse.success(authService.me(principal.userId())));
+    }
+
+    @GetMapping("/sessions")
+    public ResponseEntity<ApiResponse<List<AuthSessionResponse>>> sessions() {
+        AuthPrincipal principal = SecurityUtils.currentPrincipal();
+        return ResponseEntity.ok(ApiResponse.success(authService.getSessions(principal.userId())));
+    }
+
+    @DeleteMapping("/sessions/{sessionId}")
+    public ResponseEntity<ApiResponse<MessageResponse>> revokeSession(@PathVariable Long sessionId) {
+        AuthPrincipal principal = SecurityUtils.currentPrincipal();
+        return ResponseEntity.ok(ApiResponse.success(authService.revokeSession(principal.userId(), sessionId)));
     }
 }

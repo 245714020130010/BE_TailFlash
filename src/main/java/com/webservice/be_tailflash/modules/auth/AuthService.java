@@ -9,7 +9,10 @@ import com.webservice.be_tailflash.modules.auth.dto.ChangePasswordRequest;
 import com.webservice.be_tailflash.modules.auth.dto.RefreshTokenRequest;
 import com.webservice.be_tailflash.modules.auth.dto.RegisterRequest;
 import com.webservice.be_tailflash.modules.auth.dto.AuthUserResponse;
+import com.webservice.be_tailflash.modules.auth.dto.AuthSessionResponse;
 import com.webservice.be_tailflash.common.dto.MessageResponse;
+
+import java.util.List;
 
 public interface AuthService {
 
@@ -28,4 +31,8 @@ public interface AuthService {
     MessageResponse changePassword(Long userId, ChangePasswordRequest request);
 
     AuthUserResponse me(Long userId);
+
+    List<AuthSessionResponse> getSessions(Long userId);
+
+    MessageResponse revokeSession(Long userId, Long sessionId);
 }

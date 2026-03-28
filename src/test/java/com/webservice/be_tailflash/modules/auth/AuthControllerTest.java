@@ -6,26 +6,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.webservice.be_tailflash.modules.auth.dto.LoginRequest;
 import com.webservice.be_tailflash.modules.auth.dto.LoginResponse;
 import com.webservice.be_tailflash.modules.auth.dto.AuthUserResponse;
+import com.webservice.be_tailflash.security.JwtTokenProvider;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @WebMvcTest(AuthController.class)
-@Import(AuthControllerTest.NoSecurityTestConfig.class)
+@AutoConfigureMockMvc(addFilters = false)
 class AuthControllerTest {
 
     @Autowired
@@ -33,6 +29,9 @@ class AuthControllerTest {
 
     @MockitoBean
     private AuthService authService;
+
+    @MockitoBean
+    private JwtTokenProvider jwtTokenProvider;
 
     @Test
     void loginShouldReturnSuccessEnvelope() throws Exception {
@@ -43,7 +42,7 @@ class AuthControllerTest {
                     "refresh",
                     "Bearer",
                     3600L,
-                    new AuthUserResponse(1L, "user@mail.com", "User", "LEARNER", true)
+                    new AuthUserResponse(1L, "user@mail.com", "User", "LEARNER", true, "ACTIVE", null, null)
                 )
             );
 
@@ -58,18 +57,5 @@ class AuthControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").value(true))
             .andExpect(jsonPath("$.data.accessToken").value("access"));
-    }
-
-    @TestConfiguration
-    static class NoSecurityTestConfig {
-
-        @Bean
-        SecurityFilterChain testSecurityFilterChain(HttpSecurity http) throws Exception {
-            http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                .httpBasic(Customizer.withDefaults());
-            return http.build();
-        }
     }
 }

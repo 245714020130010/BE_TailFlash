@@ -5,6 +5,9 @@ public record AuthUserResponse(
     String email,
     String displayName,
     String role,
-    boolean emailVerified
+    boolean emailVerified,
+    String status,
+    RoleInfoResponse roleInfo,
+    TeacherProfileSummaryResponse teacherProfile
 ) {
 }

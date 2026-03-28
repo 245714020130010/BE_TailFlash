@@ -14,8 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.webservice.be_tailflash.common.enums.Role;
-
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
@@ -41,13 +39,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if ("ACCESS".equals(tokenType) && SecurityContextHolder.getContext().getAuthentication() == null) {
                 Long userId = Long.valueOf(claims.getSubject());
                 String email = claims.get("email", String.class);
-                Role role = Role.valueOf(claims.get("role", String.class));
+                String role = claims.get("role", String.class);
 
                 AuthPrincipal principal = new AuthPrincipal(userId, email, role);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     principal,
                     null,
-                    List.of(new SimpleGrantedAuthority("ROLE_" + role.name()))
+                    List.of(new SimpleGrantedAuthority("ROLE_" + role))
                 );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

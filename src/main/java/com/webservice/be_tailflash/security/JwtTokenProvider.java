@@ -7,7 +7,6 @@ import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
-import com.webservice.be_tailflash.common.enums.Role;
 import com.webservice.be_tailflash.common.exception.UnauthorizedException;
 
 import io.jsonwebtoken.Claims;
@@ -21,7 +20,7 @@ public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
 
-    public String createAccessToken(Long userId, String email, Role role) {
+    public String createAccessToken(Long userId, String email, String roleName) {
         Instant now = Instant.now();
         Instant expiresAt = now.plusSeconds(jwtProperties.accessTokenTtlSeconds());
 
@@ -29,7 +28,7 @@ public class JwtTokenProvider {
             .issuer(jwtProperties.issuer())
             .subject(String.valueOf(userId))
             .claim("email", email)
-            .claim("role", role.name())
+            .claim("role", roleName)
             .claim("tokenType", "ACCESS")
             .issuedAt(Date.from(now))
             .expiration(Date.from(expiresAt))
