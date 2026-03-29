@@ -7,3 +7,7 @@ spring:
 logging:
   level:
     root: INFO
+
+app:
+  taxonomy:
+    dev-auto-create-tags: false

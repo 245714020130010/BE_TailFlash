@@ -33,7 +33,9 @@ public class DeckController {
     @PostMapping
     public ResponseEntity<ApiResponse<DeckResponse>> create(@Valid @RequestBody CreateDeckRequest request) {
         AuthPrincipal principal = SecurityUtils.currentPrincipal();
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(deckService.create(principal.userId(), request)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            ApiResponse.success(deckService.create(principal.userId(), principal.role(), request))
+        );
     }
 
     @GetMapping

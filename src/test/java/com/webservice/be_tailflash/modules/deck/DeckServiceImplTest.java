@@ -10,9 +10,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.webservice.be_tailflash.modules.category.CategoryRepository;
 import com.webservice.be_tailflash.modules.deck.dto.CreateDeckRequest;
 import com.webservice.be_tailflash.modules.deck.dto.DeckResponse;
 import com.webservice.be_tailflash.modules.deck.entity.Deck;
+import com.webservice.be_tailflash.modules.tag.TagRepository;
 
 @ExtendWith(MockitoExtension.class)
 class DeckServiceImplTest {
@@ -23,12 +25,21 @@ class DeckServiceImplTest {
     @Mock
     private DeckMapper deckMapper;
 
+    @Mock
+    private CategoryRepository categoryRepository;
+
+    @Mock
+    private TagRepository tagRepository;
+
+    @Mock
+    private DeckTagRepository deckTagRepository;
+
     @InjectMocks
     private DeckServiceImpl deckService;
 
     @Test
     void createShouldPersistDeckWithOwner() {
-        CreateDeckRequest request = new CreateDeckRequest("English A1", "Basic words", "PRIVATE");
+        CreateDeckRequest request = new CreateDeckRequest("English A1", "Basic words", "PRIVATE", null, null, null);
 
         Deck entity = new Deck();
         entity.setTitle("English A1");
@@ -44,9 +55,9 @@ class DeckServiceImplTest {
 
         given(deckMapper.toEntity(request)).willReturn(entity);
         given(deckRepository.save(any(Deck.class))).willReturn(saved);
-        given(deckMapper.toResponse(saved)).willReturn(new DeckResponse(10L, "English A1", "Basic words", "PRIVATE", 99L));
+        given(deckTagRepository.findByDeckId(10L)).willReturn(java.util.List.of());
 
-        DeckResponse response = deckService.create(99L, request);
+        DeckResponse response = deckService.create(99L, "LEARNER", request);
 
         assertThat(response.id()).isEqualTo(10L);
         assertThat(response.ownerId()).isEqualTo(99L);

@@ -13,13 +13,19 @@ public interface FlashcardMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "deckId", ignore = true)
+    @Mapping(target = "categoryId", ignore = true)
     @Mapping(target = "hint", expression = "java(request.hint() == null ? \"\" : request.hint())")
+    @Mapping(target = "note", expression = "java(request.note() == null ? \"\" : request.note())")
+    @Mapping(target = "sortOrder", expression = "java(request.sortOrder() == null ? 0 : request.sortOrder())")
     Flashcard toEntity(CreateFlashcardRequest request);
 
     FlashcardResponse toResponse(Flashcard entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "deckId", ignore = true)
+    @Mapping(target = "categoryId", ignore = true)
     @Mapping(target = "hint", expression = "java(request.hint() == null ? \"\" : request.hint())")
+    @Mapping(target = "note", expression = "java(request.note() == null ? \"\" : request.note())")
+    @Mapping(target = "sortOrder", expression = "java(request.sortOrder() == null ? 0 : request.sortOrder())")
     void updateEntity(UpdateFlashcardRequest request, @org.mapstruct.MappingTarget Flashcard entity);
 }

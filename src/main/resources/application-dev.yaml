@@ -13,3 +13,7 @@ spring:
 logging:
   level:
     com.webservice.be_tailflash: DEBUG
+
+app:
+  taxonomy:
+    dev-auto-create-tags: true
